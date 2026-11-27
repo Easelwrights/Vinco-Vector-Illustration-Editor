@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.pyc
+staticfiles/
+vinco.sqlite3
+node_modules/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.ruff_cache/

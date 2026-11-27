@@ -1,0 +1,16 @@
+.git
+.github
+.env
+.venv
+venv
+__pycache__
+*.pyc
+node_modules
+staticfiles
+vinco.sqlite3
+docs
+examples
+tests
+scripts
+*.pdf
+Vinco.html

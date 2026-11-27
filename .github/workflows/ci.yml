@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  javascript:
+    name: Editor (JavaScript)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Editor core tests
+        run: npm test
+      - name: Vinco.html up to date with the editor code
+        run: npm run portable -- --check
+
+  quality:
+    name: Quality and security (Ruff + Bandit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt ruff bandit
+      - name: Ruff (style, bugs and security)
+        run: ruff check .
+      - name: Bandit (Python security)
+        run: bandit -q -r editor vinco -x editor/tests
+      - name: Django production check
+        env:
+          VINCO_DEBUG: "false"
+          VINCO_SECRET_KEY: ci-random-key-with-more-than-thirty-two-characters
+          VINCO_HTTPS: "true"
+        run: python manage.py check --deploy --fail-level ERROR
+
+  interface:
+    name: Interface (Playwright)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Editor end-to-end tests
+        run: python -m unittest discover -s tests/e2e -v
+
+  django:
+    name: API (Django + PostgreSQL)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: vinco
+          POSTGRES_USER: vinco
+          POSTGRES_PASSWORD: vinco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vinco"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      VINCO_DB_ENGINE: postgresql
+      VINCO_DB_HOST: localhost
+      VINCO_DB_NAME: vinco
+      VINCO_DB_USER: vinco
+      VINCO_DB_PASSWORD: vinco
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Check migrations
+        run: python manage.py makemigrations --check --dry-run
+      - name: API tests
+        run: python manage.py test editor -v 2
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the image
+        run: docker build -t vinco:ci .

@@ -1,0 +1,49 @@
+name: vinco
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${VINCO_DB_NAME:-vinco}
+      POSTGRES_USER: ${VINCO_DB_USER:-vinco}
+      POSTGRES_PASSWORD: ${VINCO_DB_PASSWORD:?Defina VINCO_DB_PASSWORD no arquivo .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      VINCO_DEBUG: "false"
+      VINCO_SECRET_KEY: ${VINCO_SECRET_KEY:?Defina VINCO_SECRET_KEY no arquivo .env}
+      VINCO_ALLOWED_HOSTS: ${VINCO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      VINCO_CSRF_TRUSTED_ORIGINS: ${VINCO_CSRF_TRUSTED_ORIGINS:-}
+      VINCO_HTTPS: ${VINCO_HTTPS:-false}
+      VINCO_API_TOKEN: ${VINCO_API_TOKEN:-}
+      VINCO_MAX_REVISIONS: ${VINCO_MAX_REVISIONS:-30}
+      VINCO_MAX_DOCUMENT_MB: ${VINCO_MAX_DOCUMENT_MB:-48}
+      VINCO_WRITE_LIMIT: ${VINCO_WRITE_LIMIT:-120}
+      VINCO_TRUSTED_PROXY: ${VINCO_TRUSTED_PROXY:-false}
+      VINCO_HSTS_SECONDS: ${VINCO_HSTS_SECONDS:-31536000}
+      VINCO_WORKERS: ${VINCO_WORKERS:-2}
+      VINCO_DB_ENGINE: postgresql
+      VINCO_DB_HOST: postgres
+      VINCO_DB_PORT: "5432"
+      VINCO_DB_NAME: ${VINCO_DB_NAME:-vinco}
+      VINCO_DB_USER: ${VINCO_DB_USER:-vinco}
+      VINCO_DB_PASSWORD: ${VINCO_DB_PASSWORD}
+    ports:
+      - "${VINCO_PORT:-8080}:8000"
+
+volumes:
+  postgres-data:
+    name: vinco_dados-postgres

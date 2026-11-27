@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="./">
+    <title>Vinco</title>
+    <meta name="description" content="Vinco: editor de ilustração vetorial com caneta Bézier, formas, texto, pathfinder, degradês, camadas, pranchetas e exportação em SVG, PDF e PNG.">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/vinco.css">
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span id="logo" class="logo" aria-hidden="true"></span>
+          <span class="brand-name">Vinco</span>
+        </div>
+        <nav id="menus" class="menus" aria-label="Menu principal"></nav>
+        <input id="doc-name" class="doc-name" type="text" maxlength="120" aria-label="Nome do documento" spellcheck="false">
+        <div class="topbar-actions">
+          <button id="undo" type="button" class="icon-button" aria-label="Desfazer"></button>
+          <button id="redo" type="button" class="icon-button" aria-label="Refazer"></button>
+          <button id="save" type="button" class="icon-button" title="Salvar (Ctrl+S)" aria-label="Salvar"></button>
+          <button id="palette" type="button" class="icon-button" aria-haspopup="true" aria-expanded="false" aria-label="Paleta de cores da interface" title="Paleta de cores da interface"></button>
+          <button id="theme" type="button" class="icon-button" aria-label="Alternar tema"></button>
+        </div>
+      </header>
+      <nav id="tools" class="tools" aria-label="Ferramentas"></nav>
+      <div id="options" class="options-bar" aria-label="Barra de controle"></div>
+      <main class="area">
+        <div id="doc-tabs" class="doc-tabs" role="tablist" aria-label="Documentos abertos"></div>
+        <div id="stage" class="stage rulers">
+          <div class="ruler-corner"></div>
+          <div class="ruler top"><canvas id="ruler-top"></canvas></div>
+          <div class="ruler left"><canvas id="ruler-left"></canvas></div>
+          <div id="canvas-host" class="canvas-host">
+            <svg id="viewport" class="viewport" xmlns="http://www.w3.org/2000/svg" aria-label="Prancheta de desenho vetorial"></svg>
+            <div id="view" class="view" aria-label="Visualização"></div>
+          </div>
+        </div>
+      </main>
+      <aside id="sidebar" class="sidebar" aria-label="Painéis"></aside>
+      <footer class="status">
+        <span id="status-tool"></span>
+        <span id="status-position" class="mono">–</span>
+        <span id="status-selection" class="mono"></span>
+        <span id="status-zoom" class="mono"></span>
+        <span id="status-history"></span>
+        <span class="grow"></span>
+        <span id="status-storage"></span>
+      </footer>
+    </div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+  </body>
+</html>

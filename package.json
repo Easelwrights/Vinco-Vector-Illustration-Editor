@@ -1,0 +1,22 @@
+{
+  "name": "vinco",
+  "version": "1.0.0",
+  "description": "Editor de ilustração vetorial com caneta Bézier, formas, texto, pathfinder, degradês, camadas, pranchetas e exportação em SVG, PDF e PNG.",
+  "private": true,
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Erik Pimenta",
+  "homepage": "https://github.com/Easelwrights/Vinco-Vector-Illustration-Editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Easelwrights/Vinco-Vector-Illustration-Editor.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/js/*.test.js",
+    "serve": "node scripts/serve.js",
+    "portable": "node scripts/build-portable.js"
+  }
+}
